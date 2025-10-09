@@ -1,0 +1,62 @@
+/* Sidebar Styling */
+.sidebar {
+  position: fixed;
+  left: 0px;
+  top:0;
+  width: 250px;
+  height: 100vh;
+  background-color:white;
+  color: black;
+  padding: 20px;
+  overflow-y: auto;
+  transition: transform 0.3s ease-in-out;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+/* Show Sidebar */
+.sidebar.active {
+  transform: translateX(260px);
+}
+
+/* Close Sidebar Button */
+.close-sidebar {
+  border: none;
+  color: red;
+  font-size: 20px;
+  cursor: pointer;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  border-radius: 80%;
+}
+
+/* Headings */
+.sidebar h3 {
+  font-size: 18px;
+  margin-top: 20px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Checkboxes */
+.sidebar label {
+  display: block;
+  margin: 8px 0;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Checkbox Styling */
+.sidebar input[type="checkbox"] {
+  margin-right: 8px;
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .sidebar {
+      width: 200px;
+  }
+}
