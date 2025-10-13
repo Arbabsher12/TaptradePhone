@@ -76,7 +76,7 @@
                             </label>
                         </div>
                         
-                        <div class="custom-model-input" id="customModelInput">
+                        <div class="custom-model-input" id="customModelInput" style="display: none;">
                             <input type="text" class="form-control" id="custom_model" name="custom_model" placeholder="Enter your phone model">
                         </div>
                     </div>

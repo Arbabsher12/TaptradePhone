@@ -1,6 +1,6 @@
 <?php
     
-    include __DIR__ . '/../db.php';
+    include __DIR__ . '/db.php';
 
     // Get phone ID from URL
     $phone_id = isset($_GET['id']) ? intval($_GET['id']) : 1;

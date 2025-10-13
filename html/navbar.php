@@ -8,7 +8,7 @@ if ($isLoggedIn) {
     $user_id = $_SESSION['user_id'];
 
     // Database connection
-    include __DIR__ . '/../db.php';
+    include __DIR__ . '/../php/db.php';
     
     // Fetch user details 
     $query = "SELECT profile_picture , name FROM users WHERE user_id = ?";
@@ -23,16 +23,19 @@ if ($isLoggedIn) {
     if (empty($profile_picture)) {
         $profile_picture = "/Components/noDp.png";
     }
+    
     // Fetch unread messages count
-}
-$unreadCount = 0;
+    $unreadCount = 0;
     $unreadCountQuery = "SELECT COUNT(*) FROM messages WHERE conversation_id IN (SELECT id FROM conversations WHERE user1_id = ? OR user2_id = ?) AND is_read = 0 AND sender_id != ?";
     $stmt = $conn->prepare($unreadCountQuery);
-    $stmt->bind_param("iii", $user_id, $user_id,$user_id);
+    $stmt->bind_param("iii", $user_id, $user_id, $user_id);
     $stmt->execute();
     $stmt->bind_result($unreadCount);
     $stmt->fetch();
     $stmt->close();
+} else {
+    $unreadCount = 0;
+}
 
 ?>
 

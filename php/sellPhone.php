@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include __DIR__ . '/../db.php';
+include __DIR__ . '/db.php';
 
 $isLoggedIn = isset($_SESSION['user_id']);
 $profile_picture = "../Components/noDp.png"; // Default image
@@ -43,19 +43,54 @@ if(!function_exists('getBrands')) {
         global $conn;
         $brands = [];
         
+        // Check if database connection exists
+        if (!$conn) {
+            error_log("Database connection is null in getBrands() function");
+            return $brands;
+        }
+        
+        // First check if brands table exists
+        $tableCheck = $conn->query("SHOW TABLES LIKE 'brands'");
+        if (!$tableCheck || $tableCheck->num_rows == 0) {
+            error_log("Brands table does not exist in database");
+            return $brands;
+        }
+        
         $sql = "SELECT id, name, logo FROM brands ORDER BY name";
         $result = $conn->query($sql);
         
-        if ($result && $result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                $brands[] = $row;
+        if ($result) {
+            if ($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()) {
+                    $brands[] = $row;
+                }
+                error_log("Successfully loaded " . count($brands) . " brands");
+            } else {
+                error_log("Brands table exists but is empty");
             }
+        } else {
+            error_log("Query failed: " . $conn->error);
         }
         return $brands;
     }
 }
 
 $brands = getBrands();
+
+// If no brands found in database, provide fallback brands
+if (empty($brands)) {
+    $brands = [
+        ['id' => 1, 'name' => 'Apple', 'logo' => 'apple-logo.png'],
+        ['id' => 2, 'name' => 'Samsung', 'logo' => 'samsung-logo.png'],
+        ['id' => 3, 'name' => 'Google', 'logo' => 'google-logo.png'],
+        ['id' => 4, 'name' => 'Xiaomi', 'logo' => 'xiaomi-logo.png'],
+        ['id' => 5, 'name' => 'OnePlus', 'logo' => 'oneplus-logo.png'],
+        ['id' => 6, 'name' => 'Huawei', 'logo' => 'huawei-logo.png'],
+        ['id' => 7, 'name' => 'Motorola', 'logo' => 'motorola-logo.png'],
+        ['id' => 8, 'name' => 'Sony', 'logo' => 'sony-logo.png']
+    ];
+    error_log("Using fallback brands as database brands are not available");
+}
 
 
 

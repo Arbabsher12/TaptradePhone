@@ -39,6 +39,59 @@
     margin-bottom: 10px;
 }
 
+
+/* Disabled model dropdown styling */
+
+#model_id:disabled {
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+    border-color: #dee2e6 !important;
+}
+
+#model_id:disabled:focus {
+    box-shadow: none !important;
+    border-color: #dee2e6 !important;
+}
+
+
+/* Custom model input styling */
+
+.custom-model-input {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+}
+
+.custom-model-input input {
+    border: 1px solid #28a745;
+    background-color: #fff;
+}
+
+.custom-model-input input:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+
+/* When checkbox is hidden, make the input more prominent */
+
+.custom-model-input:not(.with-checkbox) {
+    background-color: #e8f5e8;
+    border: 2px solid #28a745;
+    padding: 15px;
+}
+
+.custom-model-input:not(.with-checkbox) input {
+    font-size: 16px;
+    padding: 12px;
+    border: 2px solid #28a745;
+    background-color: #fff;
+}
+
 #imagePreview {
     display: flex;
     flex-wrap: wrap;
@@ -98,25 +151,29 @@
     color: #6c757d;
 }
 
-.form-floating > .form-control {
+.form-floating>.form-control {
     padding-top: 1.625rem;
     padding-bottom: 0.625rem;
 }
 
 .progress-container {
     margin-bottom: 30px;
+    padding: 0 20px;
+    overflow: hidden;
 }
 
 .progress-step {
     display: flex;
     justify-content: space-between;
     position: relative;
-    margin-bottom: 30px;
+    margin-bottom: 60px;
+    max-width: 100%;
+    padding: 0 20px;
 }
 
 .step {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background-color: #e9ecef;
     display: flex;
@@ -124,42 +181,170 @@
     justify-content: center;
     font-weight: bold;
     z-index: 2;
+    position: relative;
+    flex-shrink: 0;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
 }
 
 .step.active {
-    background-color: var(--primary-color);
+    background-color: #007bff;
     color: white;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
 }
 
 .step.completed {
-    background-color: var(--success-color);
+    background-color: #28a745;
     color: white;
+    border-color: #28a745;
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+}
+
+.step.completed::after {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+    font-weight: bold;
 }
 
 .progress-line {
     position: absolute;
-    top: 15px;
-    left: 30px;
-    right: 30px;
-    height: 2px;
+    top: 20px;
+    left: 60px;
+    right: 60px;
+    height: 3px;
     background-color: #e9ecef;
     z-index: 1;
 }
 
 .progress-line-fill {
     height: 100%;
-    background-color: var(--success-color);
+    background-color: #28a745;
     width: 0%;
     transition: width 0.3s ease;
+    border-radius: 2px;
 }
 
 .step-label {
     position: absolute;
-    top: 35px;
-    font-size: 0.8rem;
-    transform: translateX(-50%);
+    top: 50px;
+    font-size: 0.75rem;
+    font-weight: 500;
     text-align: center;
-    width: 100px;
+    color: #495057;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+
+/* Responsive adjustments */
+
+@media (max-width: 992px) {
+    .progress-container {
+        padding: 0 15px;
+    }
+    .progress-step {
+        padding: 0 15px;
+        margin-bottom: 55px;
+    }
+    .step-label {
+        font-size: 0.7rem;
+        max-width: 90px;
+    }
+}
+
+@media (max-width: 768px) {
+    .progress-container {
+        padding: 0 10px;
+    }
+    .progress-step {
+        justify-content: space-around;
+        padding: 0 10px;
+        margin-bottom: 50px;
+    }
+    .step {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+    .step.completed::after {
+        font-size: 14px;
+    }
+    .progress-line {
+        top: 17px;
+        left: 45px;
+        right: 45px;
+    }
+    .step-label {
+        top: 45px;
+        font-size: 0.65rem;
+        max-width: 80px;
+    }
+}
+
+@media (max-width: 576px) {
+    .progress-container {
+        padding: 0 5px;
+    }
+    .progress-step {
+        padding: 0 5px;
+        margin-bottom: 45px;
+    }
+    .step {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+    .step.completed::after {
+        font-size: 12px;
+    }
+    .progress-line {
+        top: 15px;
+        left: 35px;
+        right: 35px;
+    }
+    .step-label {
+        top: 40px;
+        font-size: 0.6rem;
+        max-width: 70px;
+    }
+}
+
+@media (max-width: 480px) {
+    .progress-container {
+        padding: 0;
+    }
+    .progress-step {
+        margin-bottom: 40px;
+        padding: 0;
+    }
+    .step {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+    }
+    .step.completed::after {
+        font-size: 11px;
+    }
+    .progress-line {
+        top: 14px;
+        left: 33px;
+        right: 33px;
+    }
+    .step-label {
+        top: 38px;
+        font-size: 0.55rem;
+        max-width: 60px;
+    }
 }
 
 #phoneImages {

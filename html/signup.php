@@ -15,6 +15,7 @@
             
             <?php 
             session_start(); // Start the session to access session variables
+            include __DIR__ . '/../php/google_config.php';
              if (isset($_SESSION['signup_errors']) && is_array($_SESSION['signup_errors'])) {
                 foreach ($_SESSION['signup_errors'] as $error) {
                     echo "<p style='color: red; 
@@ -39,6 +40,13 @@
             }  
             ?>            
             
+            <div id="form-error-container" style="display: none; margin-bottom: 20px;">
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="form-error-message"></span>
+                </div>
+            </div>
+            
             <form action="/signup" method="POST" enctype="multipart/form-data">
                 <div class="profile-upload">
                     <div class="profile-image" id="profile-preview">
@@ -62,8 +70,9 @@
                 <div class="mb-3">
                     <div class="input-group">
                         <span class="input-group-text bg-transparent border-end-0"><i class="fas fa-envelope"></i></span>
-                        <input type="email" name="email" class="form-control border-start-0" placeholder="Email Address" required>
+                        <input type="email" name="email" id="email" class="form-control border-start-0" placeholder="Email Address" required>
                     </div>
+                    <!-- Email error messages will be inserted here -->
                 </div>
                 
                 <div class="mb-3">
@@ -93,14 +102,18 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="btn btn-primary w-100">Create Account</button>
+                <button type="submit" class="btn btn-primary w-100 mb-3">
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </button>
                 
-                <div class="social-divider">or sign up with</div>
+                <div class="social-divider">
+                    <span>or continue with</span>
+                </div>
                 
-                <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-google"></i></a>
+                <div class="google-signup-container">
+                    <a href="<?php echo getGoogleAuthUrl(); ?>" class="btn google-signup-btn w-100" id="google-signup-btn">
+                        <i class="fab fa-google me-2"></i>Sign up with Google
+                    </a>
                 </div>
                 
                 <div class="login-link">

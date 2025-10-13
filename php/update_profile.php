@@ -7,7 +7,7 @@ session_start();
 }
 
 // Database connection
-include __DIR__ . '/../db.php';
+include __DIR__ . '/db.php';
 
 $user_id =  $_SESSION['user_id'];
 

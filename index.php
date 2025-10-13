@@ -144,11 +144,16 @@ class Router {
 $router = new Router();
 
 // Define routes
-$router->get('/', 'minimal_home.php');
-$router->get('/home', 'minimal_home.php');
+$router->get('/', 'html/home.php');
+$router->get('/home', 'html/home.php');
 $router->get('/allPhones', 'html/allPhones.php');
 $router->get('/login', 'html/login.php');
 $router->get('/signup', 'html/signup.php');
+$router->get('/otp-verification', 'html/otp_verification.php');
+$router->get('/forgot-password', 'html/forgot_password.php');
+$router->get('/verify-reset-otp', 'html/verify_reset_otp.php');
+$router->get('/new-password', 'html/new_password.php');
+$router->get('/reset-password', 'html/reset_password.php');
 $router->get('/profile', 'html/profile.php');
 $router->get('/mylisting', 'html/myListing.php');
 $router->get('/sellYourPhone', 'html/sellYourPhone.php');
@@ -161,7 +166,13 @@ $router->get('/test', 'test_router.php');
 
 // POST routes for forms
 $router->post('/login', 'php/signin.php');
-$router->post('/signup', 'php/register.php');
+$router->post('/signup', 'php/register_with_otp.php');
+$router->post('/forgot-password', 'php/forgot_password.php');
+$router->post('/verify-reset-otp', 'php/verify_reset_otp.php');
+$router->post('/new-password', 'php/new_password.php');
+$router->post('/reset-password', 'php/reset_password.php');
+$router->post('/php/otp_handler.php', 'php/otp_handler.php');
+$router->post('/php/check_email.php', 'php/check_email.php');
 $router->post('/sellPhone', 'php/sellPhone.php');
 $router->post('/updateProfile', 'php/update_profile.php');
 $router->post('/updatePhone', 'php/updatePhone.php');

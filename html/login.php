@@ -1,5 +1,6 @@
 <?php 
 session_start();
+include __DIR__ . '/../php/google_config.php';
 ?>
 
 <!DOCTYPE html>
@@ -20,12 +21,21 @@ session_start();
         <div class="login-box">
              <h2>Login</h2>
              <?php 
-             if (!empty($_SESSION['login_errors'])): ?>
+             if (!empty($_SESSION['login_errors']) || !empty($_SESSION['signup_errors'])): ?>
              <div class="alert alert-danger">
              <?php 
-             foreach ($_SESSION['login_errors'] as $error) {
-             echo "<p>$error</p>";}
-             unset($_SESSION['login_errors']); // Clear errors after displaying
+             if (!empty($_SESSION['login_errors'])) {
+                 foreach ($_SESSION['login_errors'] as $error) {
+                     echo "<p>$error</p>";
+                 }
+                 unset($_SESSION['login_errors']); // Clear errors after displaying
+             }
+             if (!empty($_SESSION['signup_errors'])) {
+                 foreach ($_SESSION['signup_errors'] as $error) {
+                     echo "<p>$error</p>";
+                 }
+                 unset($_SESSION['signup_errors']); // Clear errors after displaying
+             }
              ?>
              </div>
              <?php endif; ?>
@@ -48,18 +58,26 @@ session_start();
                     </div>
                 </div>
                 <div class="text-end mb-3">
-                    <a href="#" class="text-muted">Forgot password?</a>
+                    <a href="/forgot-password" class="text-muted">Forgot password?</a>
                 </div>
-                <button type="submit" class="btn login-btn w-100">LOGIN</button>
+                <button type="submit" class="btn login-btn w-100 mb-3">
+                    <i class="fas fa-sign-in-alt me-2"></i>LOGIN
+                </button>
             </form>
-            <p class="mt-3">Or Sign Up Using</p>
-            <div class="social-icons d-flex justify-content-center gap-3">
-                <a href="#"><i class="fab fa-facebook-f"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>  
-                <a href="#"><i class="fab fa-google"></i></a>
+            
+            <div class="social-divider">
+                <span>or continue with</span>
             </div>
-            <p class="mt-3">Or Sign Up Using</p>
-            <a href="/signup" class="fw-bold text-decoration-none" style="color:#3A00E5;">SIGN UP</a>
+            
+            <div class="google-login-container mb-3">
+                <a href="<?php echo getGoogleAuthUrl(); ?>" class="btn google-login-btn w-100" id="google-login-btn">
+                    <i class="fab fa-google me-2"></i>Login with Google
+                </a>
+            </div>
+            
+            <div class="signup-link text-center">
+                Don't have an account? <a href="/signup" class="fw-bold text-decoration-none" style="color:#3A00E5;">SIGN UP</a>
+            </div>
         </div>
     </div>
     <!-- Bootstrap JS -->
@@ -80,6 +98,46 @@ session_start();
                 toggleIcon.classList.add('fa-eye');
             }
         }
+
+        // Google OAuth functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const googleLoginBtn = document.getElementById('google-login-btn');
+            
+            if (googleLoginBtn) {
+                googleLoginBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Add loading state
+                    const originalContent = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Connecting...';
+                    this.style.pointerEvents = 'none';
+                    
+                    // Get the Google OAuth URL from the href attribute
+                    const googleUrl = this.getAttribute('href');
+                    
+                    if (googleUrl && googleUrl !== '#') {
+                        // Redirect to Google OAuth
+                        window.location.href = googleUrl;
+                    } else {
+                        // Reset button state
+                        this.innerHTML = originalContent;
+                        this.style.pointerEvents = 'auto';
+                        alert('Google login is not properly configured. Please contact support.');
+                    }
+                });
+            }
+
+            // Add loading state to regular form submission
+            const loginForm = document.querySelector('form');
+            const loginBtn = document.querySelector('.login-btn');
+            
+            if (loginForm && loginBtn) {
+                loginForm.addEventListener('submit', function() {
+                    loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
+                    loginBtn.disabled = true;
+                });
+            }
+        });
     </script>
 </body>
 </html>

@@ -65,6 +65,11 @@ body {
     font-weight: 700;
     position: relative;
     z-index: 1;
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .signup-box h2::after {
@@ -197,42 +202,45 @@ body {
     margin-left: 15px;
 }
 
-.social-icons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
+
+/* Google Signup Button Styles */
+
+.google-signup-container {
     margin-bottom: 20px;
 }
 
-.social-icons a {
+.google-signup-btn {
+    background: #ffffff;
+    color: #5f6368;
+    border: 1px solid #dadce0;
+    padding: 12px 20px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
     text-decoration: none;
-    font-size: 18px;
-    color: white;
-    width: 45px;
-    height: 45px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.social-icons a:nth-child(1) {
-    background: #3b5998;
+.google-signup-btn:hover {
+    background: #f8f9fa;
+    border-color: #dadce0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+    color: #5f6368;
+    text-decoration: none;
 }
 
-.social-icons a:nth-child(2) {
-    background: #1DA1F2;
+.google-signup-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.social-icons a:nth-child(3) {
-    background: #DB4437;
-}
-
-.social-icons a:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+.google-signup-btn i {
+    color: #4285f4;
+    font-size: 18px;
 }
 
 .login-link {

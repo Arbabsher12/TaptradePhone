@@ -9,7 +9,7 @@ if ($isLoggedIn) {
     $user_id = $_SESSION['user_id'];
 
     // Database connection
-    include_once __DIR__ . '/../db.php';
+    include_once __DIR__ . '/../php/db.php';
 
     // Fetch user details 
     $query = "SELECT profile_picture FROM users WHERE user_id = ?";

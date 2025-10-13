@@ -65,6 +65,11 @@ body {
     font-weight: 700;
     position: relative;
     z-index: 1;
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .login-box h2::after {
@@ -169,42 +174,45 @@ body {
     margin-left: 15px;
 }
 
-.social-icons {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin: 20px 0;
+
+/* Google Login Button Styles */
+
+.google-login-container {
+    margin-bottom: 20px;
 }
 
-.social-icons a {
+.google-login-btn {
+    background: #ffffff;
+    color: #5f6368;
+    border: 1px solid #dadce0;
+    padding: 12px 20px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
     text-decoration: none;
-    font-size: 18px;
-    color: white;
-    width: 45px;
-    height: 45px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.social-icons a:nth-child(1) {
-    background: #3b5998;
+.google-login-btn:hover {
+    background: #f8f9fa;
+    border-color: #dadce0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+    color: #5f6368;
+    text-decoration: none;
 }
 
-.social-icons a:nth-child(2) {
-    background: #1DA1F2;
+.google-login-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.social-icons a:nth-child(3) {
-    background: #DB4437;
-}
-
-.social-icons a:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+.google-login-btn i {
+    color: #4285f4;
+    font-size: 18px;
 }
 
 .text-muted {
@@ -257,9 +265,201 @@ body {
     }
 }
 
+
+/* Forgot Password Specific Styles */
+
+.forgot-password-icon {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.reset-password-icon {
+    color: #28a745;
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+}
+
+.form-text {
+    font-size: 13px;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+.form-text a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.form-text a:hover {
+    text-decoration: underline;
+}
+
+
+/* OTP Input Styling */
+
+#otp_code {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+
+/* OTP Boxes Styling */
+
+.otp-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.otp-boxes {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.otp-box {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.otp-box:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    transform: scale(1.05);
+}
+
+.otp-box.filled {
+    border-color: var(--primary-color);
+    background: rgba(67, 97, 238, 0.1);
+}
+
+
+/* Password Input Container */
+
+.password-input-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.password-input-container .input-group {
+    margin-bottom: 8px;
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+
+/* Password Strength Indicator */
+
+.password-strength {
+    height: 4px;
+    border-radius: 2px;
+    margin-top: 0;
+    margin-bottom: 0;
+    transition: all 0.3s;
+    width: 100%;
+    display: block;
+    background: #e9ecef;
+    flex-shrink: 0;
+}
+
+.password-strength.weak {
+    background: linear-gradient(to right, #dc3545 25%, #e9ecef 25%);
+}
+
+.password-strength.fair {
+    background: linear-gradient(to right, #ffc107 50%, #e9ecef 50%);
+}
+
+.password-strength.good {
+    background: linear-gradient(to right, #17a2b8 75%, #e9ecef 75%);
+}
+
+.password-strength.strong {
+    background: #28a745;
+}
+
+
+/* Success/Error Message Animations */
+
+.alert {
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* Loading States */
+
+.btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 @media (max-width: 576px) {
     .login-box {
         margin: 20px;
         padding: 25px;
+    }
+    .login-box h2 {
+        font-size: 1.5rem;
+    }
+    #otp_code {
+        font-size: 16px;
+        letter-spacing: 1px;
+    }
+    .otp-boxes {
+        gap: 8px;
+    }
+    .otp-box {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
     }
 }

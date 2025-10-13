@@ -47,36 +47,57 @@ document.addEventListener('DOMContentLoaded', function() {
     // Brand selection changes
     brandSelect.addEventListener('change', function() {
         if (this.value === 'other') {
+            // For "Other" brand, disable model dropdown and enable custom input
             modelSelect.disabled = true;
+            modelSelect.required = false;
+            modelSelect.style.pointerEvents = 'none'; // Prevent any interaction
+            modelSelect.value = '';
             customModelCheck.checked = true;
             customModelInput.style.display = 'block';
             document.getElementById('custom_model').required = true;
+        } else if (this.value === '') {
+            // No brand selected, reset everything
+            modelSelect.disabled = true;
             modelSelect.required = false;
-        } else {
-            // Fetch models for the selected brand
-            fetchModels(this.value);
-            modelSelect.disabled = false;
-            customModelInput.style.display = 'none';
+            modelSelect.style.pointerEvents = 'none'; // Prevent any interaction
+            modelSelect.value = '';
+            modelSelect.innerHTML = '<option value="" selected disabled>Select Brand First</option>';
             customModelCheck.checked = false;
+            customModelInput.style.display = 'none';
+            document.getElementById('custom_model').required = false;
+            document.getElementById('custom_model').value = '';
+        } else {
+            // Valid brand selected, fetch models
+            fetchModels(this.value);
 
-            if (!customModelCheck.checked) {
-                modelSelect.required = true;
-                document.getElementById('custom_model').required = false;
-            }
+            // Reset custom model checkbox state
+            customModelCheck.checked = false;
+            customModelInput.style.display = 'none';
+            document.getElementById('custom_model').required = false;
+            document.getElementById('custom_model').value = '';
         }
     });
 
     // Custom model checkbox
     customModelCheck.addEventListener('change', function() {
         if (this.checked) {
+            // When checkbox is checked, disable model dropdown and show custom input
             customModelInput.style.display = 'block';
             document.getElementById('custom_model').required = true;
             modelSelect.required = false;
+            modelSelect.disabled = true;
+            modelSelect.style.pointerEvents = 'none'; // Prevent any interaction
+            modelSelect.value = ''; // Clear any selected value
         } else {
+            // When checkbox is unchecked, enable model dropdown and hide custom input
             customModelInput.style.display = 'none';
             document.getElementById('custom_model').required = false;
-            if (brandSelect.value !== 'other') {
+            document.getElementById('custom_model').value = ''; // Clear custom input
+
+            if (brandSelect.value !== 'other' && brandSelect.value !== '') {
                 modelSelect.required = true;
+                modelSelect.disabled = false;
+                modelSelect.style.pointerEvents = 'auto'; // Allow interaction
             }
         }
     });
@@ -84,37 +105,77 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fetch models for a brand
     function fetchModels(brandId) {
         modelSelect.innerHTML = '<option value="" selected disabled>Loading models...</option>';
+        modelSelect.disabled = true;
 
         fetch(`/api/models?brand_id=${brandId}`)
             .then(response => response.json())
             .then(data => {
-                modelSelect.innerHTML = '<option value="" selected disabled>Select Model</option>';
-
-                data.forEach(model => {
-                    const option = document.createElement('option');
-                    option.value = model.id;
-                    option.textContent = model.model_name;
-                    modelSelect.appendChild(option);
-                });
-
                 if (data.length === 0) {
+                    // No models found - completely disable dropdown and show only text input
                     modelSelect.innerHTML = '<option value="" selected disabled>No models found</option>';
+                    modelSelect.disabled = true;
+                    modelSelect.required = false;
+                    modelSelect.style.pointerEvents = 'none'; // Prevent any interaction
+
+                    // Hide checkbox and show text input directly
+                    customModel.style.display = 'none'; // Hide the checkbox
+                    customModelInput.style.display = 'block';
+                    customModelInput.classList.remove('with-checkbox'); // Remove checkbox styling
+                    document.getElementById('custom_model').required = true;
+                    document.getElementById('custom_model').placeholder = 'Enter your phone model';
+                } else {
+                    // Models found - enable dropdown and populate options
+                    modelSelect.innerHTML = '<option value="" selected disabled>Select Model</option>';
+
+                    data.forEach(model => {
+                        const option = document.createElement('option');
+                        option.value = model.id;
+                        option.textContent = model.model_name;
+                        modelSelect.appendChild(option);
+                    });
+
+                    // Enable dropdown and set as required (unless custom checkbox is checked)
+                    if (!customModelCheck.checked) {
+                        modelSelect.disabled = false;
+                        modelSelect.required = true;
+                        modelSelect.style.pointerEvents = 'auto'; // Allow interaction
+                    }
+
+                    // Show checkbox when models are available
+                    customModel.style.display = 'block';
+                    customModelInput.classList.add('with-checkbox'); // Add checkbox styling
                 }
             })
             .catch(error => {
                 console.error('Error fetching models:', error);
                 modelSelect.innerHTML = '<option value="" selected disabled>Error loading models</option>';
+                modelSelect.disabled = true;
+                modelSelect.required = false;
+                modelSelect.style.pointerEvents = 'none'; // Prevent any interaction
+
+                // On error, hide checkbox and show text input directly
+                customModel.style.display = 'none'; // Hide the checkbox
+                customModelInput.style.display = 'block';
+                customModelInput.classList.remove('with-checkbox'); // Remove checkbox styling
+                document.getElementById('custom_model').required = true;
+                document.getElementById('custom_model').placeholder = 'Enter your phone model';
             });
     }
 
     modelSelect.addEventListener("change", function() {
         if (modelSelect.value) {
+            // When a model is selected, hide custom model checkbox and input
             customModel.style.display = "none";
+            customModelInput.style.display = "none";
+            customModelCheck.checked = false;
+            document.getElementById('custom_model').required = false;
+            document.getElementById('custom_model').value = '';
         } else {
-            // Show checkbox again if no brand selected
-            customModel.style.display = "block";
+            // Show checkbox again if no model selected (but brand is selected)
+            if (brandSelect.value && brandSelect.value !== 'other') {
+                customModel.style.display = "block";
+            }
         }
-
     });
 
     // Image upload handling
@@ -268,13 +329,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Check model or custom model
-        if (customModelCheck.checked) {
+        if (customModelCheck.checked || customModelInput.style.display === 'block') {
             if (!document.getElementById('custom_model').value.trim()) {
                 alert('Please enter your phone model.');
                 document.getElementById('custom_model').focus();
                 return false;
             }
-        } else if (brandSelect.value !== 'other' && !modelSelect.value) {
+        } else if (brandSelect.value !== 'other' && brandSelect.value !== '' && !modelSelect.disabled && !modelSelect.value) {
             alert('Please select a phone model.');
             modelSelect.focus();
             return false;
@@ -351,13 +412,41 @@ document.addEventListener('DOMContentLoaded', function() {
         // Reset all steps
         [step1, step2, step3, step4].forEach(s => {
             s.classList.remove('active', 'completed');
+            // Reset step content to show numbers
+            s.innerHTML = s.id.replace('step', '');
         });
 
         // Set active step
-        if (step >= 1) step1.classList.add(step > 1 ? 'completed' : 'active');
-        if (step >= 2) step2.classList.add(step > 2 ? 'completed' : 'active');
-        if (step >= 3) step3.classList.add(step > 3 ? 'completed' : 'active');
-        if (step >= 4) step4.classList.add('active');
+        if (step >= 1) {
+            if (step > 1) {
+                step1.classList.add('completed');
+                step1.innerHTML = '';
+            } else {
+                step1.classList.add('active');
+            }
+        }
+
+        if (step >= 2) {
+            if (step > 2) {
+                step2.classList.add('completed');
+                step2.innerHTML = '';
+            } else {
+                step2.classList.add('active');
+            }
+        }
+
+        if (step >= 3) {
+            if (step > 3) {
+                step3.classList.add('completed');
+                step3.innerHTML = '';
+            } else {
+                step3.classList.add('active');
+            }
+        }
+
+        if (step >= 4) {
+            step4.classList.add('active');
+        }
 
         // Update progress line
         const progressPercentage = (step - 1) * 33.33;
@@ -372,7 +461,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Get model name
         let modelText = '';
-        if (customModelCheck.checked) {
+        if (customModelCheck.checked || customModelInput.style.display === 'block') {
             modelText = document.getElementById('custom_model').value;
         } else if (modelSelect.selectedIndex > 0) {
             modelText = modelSelect.options[modelSelect.selectedIndex].text;

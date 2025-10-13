@@ -4,7 +4,7 @@ if (!headers_sent()) {
     header("Content-Type: application/json");
 }
 
-include __DIR__ . '/../db.php';
+include __DIR__ . '/db.php';
 
 // Initialize variables
 $search = isset($_GET['search']) ? $_GET['search'] : '';
