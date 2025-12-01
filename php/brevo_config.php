@@ -4,14 +4,14 @@ require_once __DIR__ . '/env_loader.php';
 
 // Brevo API Configuration
 // Load from environment variables
-define('BREVO_API_KEY', $_ENV['BREVO_API_KEY'] ?? 'YOUR_BREVO_API_KEY_HERE');
+define('BREVO_API_KEY', $_ENV['BREVO_API_KEY'] );
 
 // Brevo API endpoints
-define('BREVO_API_URL', $_ENV['BREVO_API_URL'] ?? 'https://api.brevo.com/v3/smtp/email');
+define('BREVO_API_URL', $_ENV['BREVO_API_URL'] );
 
 // Email configuration
-define('FROM_EMAIL', $_ENV['FROM_EMAIL'] ?? 'your-email@example.com');
-define('FROM_NAME', $_ENV['FROM_NAME'] ?? 'Buy Sell Phone');
+define('FROM_EMAIL', $_ENV['FROM_EMAIL'] );
+define('FROM_NAME', $_ENV['FROM_NAME'] );
 
 // OTP configuration
 define('OTP_LENGTH', (int)($_ENV['OTP_LENGTH'] ?? 6));

@@ -1,5 +1,7 @@
 /uploads/ 
 .env
 php/brevo_config.php
-
+php/db_config.php
+php/googele_config.php
+- --- IGNORE ---
 
