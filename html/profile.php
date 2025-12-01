@@ -33,7 +33,14 @@ $created_at = new DateTime($user['created_at']);
 $formatted_date = $created_at->format('F j, Y');
 
 // Set default profile picture if none exists
-$profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] : '../Components/Nodp.png';
+if (!empty($user['profile_picture'])) {
+    $profile_picture = $user['profile_picture'];
+    // Check if it's a Google profile picture URL (starts with http)
+    $profile_picture_display = (strpos($profile_picture, 'http') === 0) ? $profile_picture : '../' . $profile_picture;
+} else {
+    $profile_picture = '../Components/Nodp.png';
+    $profile_picture_display = $profile_picture;
+}
 ?>
 
 <!DOCTYPE html>
@@ -54,7 +61,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
             <div class="profile-content">
                 <div class="profile-sidebar">
                     <div class="profile-avatar">
-                      <img src="../<?php echo htmlspecialchars($profile_picture);?>" alt="<?php echo htmlspecialchars($user['name']); ?>" onerror="this.src='../Components/Nodp.png'; this.onerror=null;">
+                      <img src="<?php echo htmlspecialchars($profile_picture_display);?>" alt="<?php echo htmlspecialchars($user['name']); ?>" onerror="this.src='../Components/Nodp.png'; this.onerror=null;">
                     </div>
                     <button id="edit-profile-btn" class="btn btn-outline">Edit Profile</button>
                 </div>
@@ -104,7 +111,7 @@ $profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] :
                 <div class="form-group">
                     <label for="profile_picture">Profile Picture</label>
                     <div class="profile-picture-upload">
-                        <img src="../<?php echo htmlspecialchars($profile_picture); ?>" alt="Profile Preview" id="profile-preview" onerror="this.src='../Components/Nodp.png'; this.onerror=null;">
+                        <img src="<?php echo htmlspecialchars($profile_picture_display); ?>" alt="Profile Preview" id="profile-preview" onerror="this.src='../Components/Nodp.png'; this.onerror=null;">
                         <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
                     </div>
                 </div>

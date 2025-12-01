@@ -10,14 +10,24 @@ if ($isLoggedIn) {
     // Database connection
     include __DIR__ . '/../php/db.php';
     
-    // Fetch user details 
-    $query = "SELECT profile_picture , name FROM users WHERE user_id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $stmt->bind_result($profile_picture, $name);
-    $stmt->fetch();
-    $stmt->close();
+    // Check if we have profile picture in session (for Google users)
+    if (isset($_SESSION['user_profile_picture']) && !empty($_SESSION['user_profile_picture'])) {
+        $profile_picture = $_SESSION['user_profile_picture'];
+        $name = $_SESSION['user_name'];
+        // Debug: Log that we're using session profile picture
+        error_log("Navbar: Using session profile picture: " . $profile_picture);
+    } else {
+        // Fetch user details from database
+        $query = "SELECT profile_picture , name FROM users WHERE user_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $stmt->bind_result($profile_picture, $name);
+        $stmt->fetch();
+        $stmt->close();
+        // Debug: Log that we're using database profile picture
+        error_log("Navbar: Using database profile picture: " . $profile_picture);
+    }
 
     // Set default profile picture if none is found
     if (empty($profile_picture)) {
@@ -84,7 +94,11 @@ if ($isLoggedIn) {
                 <?php if ($isLoggedIn): ?>
                     <div class="dropdown me-3">
                         <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="<?php echo htmlspecialchars($profile_picture);?>" onerror=" this.src='/Components/noDp.png'; this.onerror=null;" alt="Profile" class="profile-pic me-2">
+                            <img src="<?php echo htmlspecialchars($profile_picture);?>" 
+                                 onerror="this.src='/Components/noDp.png'; this.onerror=null;" 
+                                 alt="Profile" 
+                                 class="profile-pic me-2"
+                                 style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
                             <span class="d-none d-sm-inline text-light"><?php echo htmlspecialchars($name);?></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">

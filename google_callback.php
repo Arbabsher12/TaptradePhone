@@ -37,14 +37,29 @@ try {
     $user_info = getGoogleUserInfo($access_token);
     
     if (!$user_info || isset($user_info['error'])) {
-        throw new Exception('Failed to get user information from Google');
+        error_log("Google OAuth Error: Failed to get user info. Response: " . print_r($user_info, true));
+        throw new Exception('Failed to get user information from Google: ' . (isset($user_info['error']) ? $user_info['error'] : 'Unknown error'));
     }
+    
+    // Debug: Log the user info received from Google
+    error_log("Google OAuth: User info received: " . print_r($user_info, true));
     
     // Extract user data
     $google_id = $user_info['id'];
     $name = $user_info['name'];
     $email = $user_info['email'];
     $profile_picture = isset($user_info['picture']) ? $user_info['picture'] : null;
+    
+    // Debug: Log profile picture URL
+    error_log("Google OAuth: Profile picture URL: " . $profile_picture);
+    
+    // Ensure profile picture URL is properly formatted
+    if ($profile_picture && !empty($profile_picture)) {
+        // Remove any existing size parameter and add a standard one
+        $profile_picture = preg_replace('/=s\d+-c$/', '', $profile_picture);
+        $profile_picture = $profile_picture . '=s96-c';
+        error_log("Google OAuth: Formatted profile picture URL: " . $profile_picture);
+    }
     
     // Check if user already exists by email
     $sql = "SELECT user_id, name, email, profile_picture, login_method, google_id FROM users WHERE email = ?";
@@ -100,6 +115,9 @@ try {
         $_SESSION['user_profile_picture'] = $user['profile_picture'];
         $_SESSION['login_method'] = 'google';
         
+        // Debug: Log the profile picture URL
+        error_log("Google OAuth: Existing user profile picture: " . $user['profile_picture']);
+        
         $stmt->close();
         $conn->close();
         
@@ -129,12 +147,15 @@ try {
             // Get the new user ID
             $new_user_id = $conn->insert_id;
             
-            // Set session variables
-            $_SESSION['user_id'] = $new_user_id;
-            $_SESSION['user_name'] = $name;
-            $_SESSION['user_email'] = $email;
-            $_SESSION['user_profile_picture'] = $profile_picture;
-            $_SESSION['login_method'] = 'google';
+        // Set session variables
+        $_SESSION['user_id'] = $new_user_id;
+        $_SESSION['user_name'] = $name;
+        $_SESSION['user_email'] = $email;
+        $_SESSION['user_profile_picture'] = $profile_picture;
+        $_SESSION['login_method'] = 'google';
+        
+        // Debug: Log the profile picture URL
+        error_log("Google OAuth: New user profile picture set to: " . $profile_picture);
             
             $stmt->close();
             $conn->close();

@@ -11,14 +11,19 @@ if ($isLoggedIn) {
     // Database connection
     include_once __DIR__ . '/../php/db.php';
 
-    // Fetch user details 
-    $query = "SELECT profile_picture FROM users WHERE user_id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $stmt->bind_result($profile_picture);
-    $stmt->fetch();
-    $stmt->close();
+    // Check if we have profile picture in session (for Google users)
+    if (isset($_SESSION['user_profile_picture']) && !empty($_SESSION['user_profile_picture'])) {
+        $profile_picture = $_SESSION['user_profile_picture'];
+    } else {
+        // Fetch user details from database
+        $query = "SELECT profile_picture FROM users WHERE user_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $stmt->bind_result($profile_picture);
+        $stmt->fetch();
+        $stmt->close();
+    }
 
     // Set default profile picture if none is found
     if (empty($profile_picture)) {

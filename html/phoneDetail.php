@@ -125,7 +125,13 @@
                         <h5 class="mb-3">Seller Information</h5>
                         <div class="seller-info">
                             <?php if (!empty($phone['profile_picture'])): ?>
-                                <img src="../uploads/<?php echo htmlspecialchars($phone['profile_picture']); ?>" class="seller-avatar" alt="Seller">
+                                <?php 
+                                // Check if it's a Google profile picture URL (starts with http)
+                                $seller_profile_display = (strpos($phone['profile_picture'], 'http') === 0) 
+                                    ? $phone['profile_picture'] 
+                                    : '../uploads/' . $phone['profile_picture'];
+                                ?>
+                                <img src="<?php echo htmlspecialchars($seller_profile_display); ?>" class="seller-avatar" alt="Seller" onerror="this.src='../components/noDp.png'; this.onerror=null;">
                             <?php else: ?>
                                 <img src="../components/noDp.png" class="seller-avatar" alt="Seller">
                             <?php endif; ?>

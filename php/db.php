@@ -1,8 +1,8 @@
 <?php
 // Database configuration
 // Check if we're on localhost (development) or hosting
-if ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1' || strpos($_SERVER['HTTP_HOST'], 'localhost:') === 0) {
-    // Local development settings
+if (!isset($_SERVER['HTTP_HOST']) || $_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1' || strpos($_SERVER['HTTP_HOST'], 'localhost:') === 0) {
+    // Local development settings (also used for command line execution)
     $servername = "localhost";
     $username = "root";
     $password = "";

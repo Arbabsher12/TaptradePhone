@@ -19,8 +19,12 @@ $offset = ($page - 1) * $limit;
 
 // Build query
 $query = "SELECT p.*, 
+          b.name as brand_name,
+          pm.model_name,
           (SELECT COUNT(*) FROM phones WHERE id = p.id) as image_count
           FROM phones p
+          LEFT JOIN brands b ON p.brand_id = b.id
+          LEFT JOIN phone_models pm ON p.model_id = pm.id
           WHERE 1=1";
 
 // Add search condition
@@ -131,7 +135,7 @@ error_log("Page: $page, Limit: $limit, Offset: $offset");
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         // Process image paths properly
-        $firstImage = '/uploads/none.jpg'; // Default image path
+        $firstImage = '../uploads/none.jpg'; // Default image path
         
         if (!empty($row["image_paths"])) {
             // Remove quotes and get the first image
@@ -140,12 +144,34 @@ if ($result && $result->num_rows > 0) {
             
             if (!empty($images[0])) {
                 $firstImage = trim($images[0]);
+                
+                // Normalize the image path
+                if (!str_starts_with($firstImage, '../uploads/') && !str_starts_with($firstImage, '/uploads/')) {
+                    if (str_starts_with($firstImage, 'uploads/')) {
+                        $firstImage = '../' . $firstImage;
+                    } else {
+                        $firstImage = '../uploads/' . $firstImage;
+                    }
+                }
+            }
+        }
+
+        // Determine the phone name - use custom name, model name, or brand name as fallback
+        $phoneName = $row["phone_name"];
+        if (empty($phoneName)) {
+            // If no custom name, try to construct from brand and model
+            if (!empty($row["model_name"])) {
+                $phoneName = $row["model_name"];
+            } elseif (!empty($row["brand_name"])) {
+                $phoneName = $row["brand_name"] . " Phone";
+            } else {
+                $phoneName = "Phone";
             }
         }
 
         $phones[] = [
             "id" => $row["id"],
-            "name" => $row["phone_name"],
+            "name" => $phoneName,
             "price" => $row["phone_price"],
             "condition" => $row["phone_condition"],
             "details" => $row["phone_details"],

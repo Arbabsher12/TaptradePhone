@@ -117,9 +117,34 @@ if (isset($_GET['action']) && $_GET['action'] == 'getModels' && isset($_GET['bra
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $brand_id = $_POST["brand_id"];
-    $model_id = $_POST["model_id"];
-    $custom_model = isset($_POST["custom_model"]) ? $_POST["custom_model"] : null;
+    // Debug: Log all POST data
+    error_log("POST data: " . print_r($_POST, true));
+    
+    // Handle brand_id - convert "other" to NULL
+    $brand_id_raw = $_POST["brand_id"];
+    error_log("brand_id_raw: " . $brand_id_raw);
+    $brand_id = ($brand_id_raw === "other") ? null : intval($brand_id_raw);
+    
+    // Handle model_id - convert "not_listed" to NULL
+    // Note: When brand is "other", model_id might not be submitted at all (disabled field)
+    $model_id_raw = isset($_POST["model_id"]) ? $_POST["model_id"] : null;
+    error_log("model_id_raw: " . var_export($model_id_raw, true));
+    if (empty($model_id_raw) || $model_id_raw === "not_listed") {
+        $model_id = null;
+    } else {
+        $model_id = intval($model_id_raw);
+    }
+    
+    // Get custom_model - this should be set when using custom brand or model
+    $custom_model = isset($_POST["custom_model"]) ? trim($_POST["custom_model"]) : null;
+    error_log("custom_model: " . var_export($custom_model, true));
+    error_log("custom_model raw POST: " . var_export($_POST["custom_model"] ?? 'NOT SET', true));
+    
+    // Validate that we have either a model_id or custom_model
+    if (empty($custom_model) && $model_id === null) {
+        error_log("ERROR: No model_id and no custom_model provided");
+        die(json_encode(["status" => "error", "message" => "Please select or enter a phone model."]));
+    }
     $phonePrice = $_POST["phonePrice"];
     $phoneStorage = $_POST["phoneStorage"];
     $phoneColor = $_POST["phoneColor"];
@@ -167,7 +192,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Determine the phone name (either from model or custom input)
     $phoneName = $custom_model;
+    error_log("Initial phoneName from custom_model: " . var_export($phoneName, true));
+    
     if (empty($custom_model) && !empty($model_id)) {
+        // Fetch model name from database
         $modelStmt = $conn->prepare("SELECT model_name FROM phone_models WHERE id = ?");
         $modelStmt->bind_param("i", $model_id);
         $modelStmt->execute();
@@ -177,20 +205,76 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         $modelStmt->close();
     }
-
-    $stmt = $conn->prepare("INSERT INTO phones (brand_id, model_id, sellerId, phone_name, phone_price, phone_storage, phone_color, phone_condition, phone_details, image_paths, seller_name, seller_email, seller_phone, seller_location, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
     
-    if (!$stmt) {
-        die(json_encode(["status" => "error", "message" => "SQL Prepare failed: " . $conn->error]));
+    // If we still don't have a phone name, create a default one
+    if (empty($phoneName)) {
+        if (!empty($brand_id)) {
+            // Fetch brand name
+            $brandStmt = $conn->prepare("SELECT name FROM brands WHERE id = ?");
+            $brandStmt->bind_param("i", $brand_id);
+            $brandStmt->execute();
+            $brandResult = $brandStmt->get_result();
+            if ($brandRow = $brandResult->fetch_assoc()) {
+                $phoneName = $brandRow['name'] . " Phone";
+            } else {
+                $phoneName = "Phone";
+            }
+            $brandStmt->close();
+        } else {
+            $phoneName = "Phone";
+        }
     }
+    
+    error_log("Final phoneName before insert: " . var_export($phoneName, true));
 
-    $stmt->bind_param("iiisdsssssssss", $brand_id, $model_id, $sellerId, $phoneName, $phonePrice, $phoneStorage, $phoneColor, $phoneCondition, $phoneDetails, $imagePathsStr, $sellerName, $sellerEmail, $sellerPhone, $sellerLocation);
+    // Build dynamic SQL based on whether brand_id and model_id are NULL
+    // Since MySQL doesn't support variable types in prepare, we need separate queries
+    if ($brand_id === null && $model_id === null) {
+        $stmt = $conn->prepare("INSERT INTO phones (brand_id, model_id, sellerId, phone_name, phone_price, phone_storage, phone_color, phone_condition, phone_details, image_paths, seller_name, seller_email, seller_phone, seller_location, created_at)
+        VALUES (NULL, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+        
+        if (!$stmt) {
+            die(json_encode(["status" => "error", "message" => "SQL Prepare failed: " . $conn->error]));
+        }
+
+        $stmt->bind_param("isdsisssssss", $sellerId, $phoneName, $phonePrice, $phoneStorage, $phoneColor, $phoneCondition, $phoneDetails, $imagePathsStr, $sellerName, $sellerEmail, $sellerPhone, $sellerLocation);
+    } elseif ($brand_id === null) {
+        $stmt = $conn->prepare("INSERT INTO phones (brand_id, model_id, sellerId, phone_name, phone_price, phone_storage, phone_color, phone_condition, phone_details, image_paths, seller_name, seller_email, seller_phone, seller_location, created_at)
+        VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+        
+        if (!$stmt) {
+            die(json_encode(["status" => "error", "message" => "SQL Prepare failed: " . $conn->error]));
+        }
+
+        $stmt->bind_param("iisdsisssssss", $model_id, $sellerId, $phoneName, $phonePrice, $phoneStorage, $phoneColor, $phoneCondition, $phoneDetails, $imagePathsStr, $sellerName, $sellerEmail, $sellerPhone, $sellerLocation);
+    } elseif ($model_id === null) {
+        $stmt = $conn->prepare("INSERT INTO phones (brand_id, model_id, sellerId, phone_name, phone_price, phone_storage, phone_color, phone_condition, phone_details, image_paths, seller_name, seller_email, seller_phone, seller_location, created_at)
+        VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+        
+        if (!$stmt) {
+            die(json_encode(["status" => "error", "message" => "SQL Prepare failed: " . $conn->error]));
+        }
+
+        $stmt->bind_param("iisdsisssssss", $brand_id, $sellerId, $phoneName, $phonePrice, $phoneStorage, $phoneColor, $phoneCondition, $phoneDetails, $imagePathsStr, $sellerName, $sellerEmail, $sellerPhone, $sellerLocation);
+    } else {
+        $stmt = $conn->prepare("INSERT INTO phones (brand_id, model_id, sellerId, phone_name, phone_price, phone_storage, phone_color, phone_condition, phone_details, image_paths, seller_name, seller_email, seller_phone, seller_location, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+        
+        if (!$stmt) {
+            die(json_encode(["status" => "error", "message" => "SQL Prepare failed: " . $conn->error]));
+        }
+
+        $stmt->bind_param("iiisdsisssssss", $brand_id, $model_id, $sellerId, $phoneName, $phonePrice, $phoneStorage, $phoneColor, $phoneCondition, $phoneDetails, $imagePathsStr, $sellerName, $sellerEmail, $sellerPhone, $sellerLocation);
+    }
 
 
     if ($stmt->execute()) {
         echo json_encode(["status" => "success", "message" => "Your phone listing has been successfully created!"]);
     } else {
+        error_log("SQL Error: " . $stmt->error);
+        error_log("brand_id: " . var_export($brand_id, true));
+        error_log("model_id: " . var_export($model_id, true));
+        error_log("custom_model: " . var_export($custom_model, true));
         echo json_encode(["status" => "error", "message" => "Failed to store data: " . $stmt->error]);
     }
 

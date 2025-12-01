@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const phoneImagesInput = document.getElementById('phoneImages');
     const browseButton = document.getElementById('browseButton');
     const imagePreview = document.getElementById('imagePreview');
+    const CheckboxDiv = document.getElementById('customModel');
 
     // Navigation buttons
     const nextToPhotosBtn = document.getElementById('nextToPhotos');
@@ -52,9 +53,10 @@ document.addEventListener('DOMContentLoaded', function() {
             modelSelect.style.pointerEvents = 'none';
             modelSelect.value = '';
             modelSelect.innerHTML = '<option value="" disabled>Brand not listed</option>';
-
+            
             customModelInput.style.display = 'block';
             customModelField.required = true;
+            customModelField.placeholder = 'Enter your phone model';
             customModelField.value = '';
         } else if (this.value === '') {
             // No brand selected, reset everything
@@ -63,14 +65,14 @@ document.addEventListener('DOMContentLoaded', function() {
             modelSelect.style.pointerEvents = 'none';
             modelSelect.value = '';
             modelSelect.innerHTML = '<option value="" selected disabled>Select Brand First</option>';
-
+            
             customModelInput.style.display = 'none';
             customModelField.required = false;
             customModelField.value = '';
         } else {
             // Valid brand selected, fetch models
             fetchModels(this.value);
-
+            
             customModelInput.style.display = 'none';
             customModelField.required = false;
             customModelField.value = '';
@@ -87,16 +89,20 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.length === 0) {
-                    // Case 1: No models found - show text input directly
+                    // No models found - completely disable dropdown and show only text input
                     modelSelect.innerHTML = '<option value="" selected disabled>No models found</option>';
                     modelSelect.disabled = true;
                     modelSelect.required = false;
-                    modelSelect.style.pointerEvents = 'none';
+                    modelSelect.style.pointerEvents = 'none'; // Prevent any interaction
 
+                    // Hide checkbox and show text input directly
+                    customModel.style.display = 'none'; // Hide the checkbox
                     customModelInput.style.display = 'block';
-                    customModelField.required = true;
+                    customModelInput.classList.remove('with-checkbox'); // Remove checkbox styling
+                    document.getElementById('custom_model').required = true;
+                    document.getElementById('custom_model').placeholder = 'Enter your phone model';
                 } else {
-                    // Case 3: Models found - populate dropdown with "My model is not listed" option
+                    // Models found - enable dropdown and populate options
                     modelSelect.innerHTML = '<option value="" selected disabled>Select Model</option>';
 
                     data.forEach(model => {
@@ -106,18 +112,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         modelSelect.appendChild(option);
                     });
 
-                    // Add "My model is not listed" option
-                    const notListedOption = document.createElement('option');
-                    notListedOption.value = 'not_listed';
-                    notListedOption.textContent = 'My model is not listed';
-                    modelSelect.appendChild(notListedOption);
+                    // Enable dropdown and set as required (unless custom checkbox is checked)
+                    if (!customModelCheck.checked) {
+                        modelSelect.disabled = false;
+                        modelSelect.required = true;
+                        modelSelect.style.pointerEvents = 'auto'; // Allow interaction
+                    }
 
-                    modelSelect.disabled = false;
-                    modelSelect.required = true;
-                    modelSelect.style.pointerEvents = 'auto';
-
-                    customModelInput.style.display = 'none';
-                    customModelField.required = false;
+                    // Show checkbox when models are available
+                    customModel.style.display = 'block';
+                    customModelInput.classList.add('with-checkbox'); // Add checkbox styling
                 }
             })
             .catch(error => {
@@ -127,24 +131,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 modelSelect.required = false;
                 modelSelect.style.pointerEvents = 'none'; // Prevent any interaction
 
-                // On error, show text input directly
+                // On error, hide checkbox and show text input directly
+                customModel.style.display = 'none'; // Hide the checkbox
                 customModelInput.style.display = 'block';
-                customModelField.required = true;
+                customModelInput.classList.remove('with-checkbox'); // Remove checkbox styling
+                document.getElementById('custom_model').required = true;
+                document.getElementById('custom_model').placeholder = 'Enter your phone model';
             });
     }
 
-    // Model selection changes - implements Case 1
     modelSelect.addEventListener("change", function() {
-        if (modelSelect.value === 'not_listed') {
-            // Case 1: "My model is not listed" selected - show text input
-            customModelInput.style.display = "block";
-            customModelField.required = true;
-            customModelField.value = '';
-        } else if (modelSelect.value) {
-            // Case 3: Regular model selected - hide text input
+        if (modelSelect.value) {
+            // When a model is selected, hide custom model checkbox and input
+            customModel.style.display = "none";
             customModelInput.style.display = "none";
-            customModelField.required = false;
-            customModelField.value = '';
+            customModelCheck.checked = false;
+            document.getElementById('custom_model').required = false;
+            document.getElementById('custom_model').value = '';
+        } else {
+            // Show checkbox again if no model selected (but brand is selected)
+            if (brandSelect.value && brandSelect.value !== 'other') {
+                customModel.style.display = "block";
+            }
         }
     });
 
@@ -298,12 +306,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return false;
         }
 
-        // Check model or custom model based on use case
-        if (customModelInput.style.display === 'block') {
-            // Text input is visible (cases 1 or 2)
-            if (!customModelField.value.trim()) {
+        // Check model or custom model
+        if (customModelCheck.checked || customModelInput.style.display === 'block') {
+            if (!document.getElementById('custom_model').value.trim()) {
                 alert('Please enter your phone model.');
-                customModelField.focus();
+                document.getElementById('custom_model').focus();
                 return false;
             }
         } else if (brandSelect.value !== 'other' && brandSelect.value !== '' && !modelSelect.disabled && !modelSelect.value) {
@@ -320,8 +327,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Check color
-        if (!document.getElementById('phoneColor').value) {
-            alert('Please select a phone color.');
+        if (!document.getElementById('phoneColor').value.trim()) {
+            alert('Please enter the phone color.');
             document.getElementById('phoneColor').focus();
             return false;
         }
@@ -427,21 +434,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Populate review section
     function populateReviewSection() {
         // Get brand name
-        let brandText = brandSelect.options[brandSelect.selectedIndex].text;
-        if (brandText === 'My brand is not listed') {
-            brandText = 'Custom Brand';
-        }
+        const brandText = brandSelect.options[brandSelect.selectedIndex].text;
         document.getElementById('reviewBrand').textContent = brandText;
 
         // Get model name
         let modelText = '';
-        if (customModelInput.style.display === 'block') {
-            modelText = customModelField.value;
+        if (customModelCheck.checked || customModelInput.style.display === 'block') {
+            modelText = document.getElementById('custom_model').value;
         } else if (modelSelect.selectedIndex > 0) {
             modelText = modelSelect.options[modelSelect.selectedIndex].text;
-            if (modelText === 'My model is not listed') {
-                modelText = 'N/A';
-            }
         }
         document.getElementById('reviewModel').textContent = modelText;
 
@@ -505,12 +506,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
         const formData = new FormData(this);
-
-        // Debug: Log form data
-        console.log('Form Data:');
-        for (let pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-        }
 
         // Show loading state
         submitListingBtn.disabled = true;

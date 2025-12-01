@@ -117,7 +117,7 @@ function displayPhones(phones) {
 
 
                 // Handle different image path formats
-                let imagePath = '../Components/noDp.png'; // Default
+                let imagePath = '../uploads/none.jpg'; // Default for no image
                 if (phone.image && phone.image.trim() !== '' && phone.image !== '/uploads/none.jpg' && phone.image !== 'uploads/none.jpg') {
                     if (phone.image.startsWith('../uploads/')) {
                         imagePath = phone.image;
@@ -138,7 +138,7 @@ function displayPhones(phones) {
                 phoneCard.innerHTML = `
             <div class="phone-card">
                 <div class="phone-image-container">
-                    <img src="${imagePath}" alt="${phone.name}" class="phone-image" onerror="this.onerror=null;this.src='../Components/noDp.png';">
+                    <img src="${imagePath}" alt="${phone.name}" class="phone-image" onerror="this.onerror=null;this.src='../uploads/none.jpg';">
                     ${phone.condition ? `<span class="phone-condition ${conditionClass}">${conditionText}</span>` : ''}
                 </div>
                 <div class="phone-details">

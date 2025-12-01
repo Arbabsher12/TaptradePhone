@@ -58,26 +58,23 @@
                          <?php echo $brand['name']; ?>
                          </option>
                          <?php endforeach; ?>
-                         <option value="other">Other</option>
+                         <option value="other">My brand is not listed</option>
                         </select>
 
                     </div>
                     
                     <div class="mb-3">
                         <label for="model_id" class="form-label required-field">Phone Model</label>
-                        <select class="form-select" id="model_id" name="model_id" required disabled>
+                        <select class="form-select" id="model_id" name="model_id" disabled>
                             <option value="" selected disabled>Select Brand First</option>
                         </select>
                         
-                        <div class="form-check mt-2" id="customModel" >
-                            <input class="form-check-input" type="checkbox" id="customModelCheck">
-                            <label class="form-check-label" for="customModelCheck">
-                                My model is not listed
-                            </label>
-                        </div>
-                        
                         <div class="custom-model-input" id="customModelInput" style="display: none;">
-                            <input type="text" class="form-control" id="custom_model" name="custom_model" placeholder="Enter your phone model">
+                            <label class="custom-model-label">
+                                <i class="fas fa-mobile-alt me-2"></i>
+                                <span>Enter your custom model name</span>
+                            </label>
+                            <input type="text" class="form-control custom-model-field" id="custom_model" name="custom_model" placeholder="e.g. iPhone 15 Pro Max, Samsung Galaxy S24">
                         </div>
                     </div>
                     
@@ -98,7 +95,23 @@
                         
                         <div class="col-md-6 mb-3">
                             <label for="phoneColor" class="form-label required-field">Color</label>
-                            <input type="text" class="form-control" id="phoneColor" name="phoneColor" placeholder="e.g. Black, White, Gold" required>
+                            <select class="form-select color-dropdown" id="phoneColor" name="phoneColor" required>
+                                <option value="" selected disabled>Select Color</option>
+                                <option value="Black" data-color="#000000" class="color-option-black">Black</option>
+                                <option value="White" data-color="#ffffff" class="color-option-white">White</option>
+                                <option value="Silver" data-color="#c0c0c0" class="color-option-silver">Silver</option>
+                                <option value="Gold" data-color="#ffd700" class="color-option-gold">Gold</option>
+                                <option value="Rose Gold" data-color="#e8b4b8" class="color-option-rosegold">Rose Gold</option>
+                                <option value="Red" data-color="#dc3545" class="color-option-red">Red</option>
+                                <option value="Blue" data-color="#007bff" class="color-option-blue">Blue</option>
+                                <option value="Green" data-color="#28a745" class="color-option-green">Green</option>
+                                <option value="Purple" data-color="#6f42c1" class="color-option-purple">Purple</option>
+                                <option value="Pink" data-color="#e83e8c" class="color-option-pink">Pink</option>
+                                <option value="Orange" data-color="#fd7e14" class="color-option-orange">Orange</option>
+                                <option value="Yellow" data-color="#ffc107" class="color-option-yellow">Yellow</option>
+                                <option value="Grey" data-color="#6c757d" class="color-option-grey">Grey</option>
+                                <option value="Other" data-color="#999999" class="color-option-other">Other</option>
+                            </select>
                         </div>
                     </div>
                     

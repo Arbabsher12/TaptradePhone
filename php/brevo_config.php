@@ -1,19 +1,22 @@
 <?php
+// Load environment variables
+require_once __DIR__ . '/env_loader.php';
+
 // Brevo API Configuration
-// Replace with your actual Brevo API key
-define('BREVO_API_KEY', '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');
+// Load from environment variables
+define('BREVO_API_KEY', $_ENV['BREVO_API_KEY'] ?? 'YOUR_BREVO_API_KEY_HERE');
 
 // Brevo API endpoints
-define('BREVO_API_URL', 'https://api.brevo.com/v3/smtp/email');
+define('BREVO_API_URL', $_ENV['BREVO_API_URL'] ?? 'https://api.brevo.com/v3/smtp/email');
 
 // Email configuration
-define('FROM_EMAIL', 'arbabrahimullahjan@gmail.com'); // Replace with your Gmail
-define('FROM_NAME', 'Buy Sell Phone');
+define('FROM_EMAIL', $_ENV['FROM_EMAIL'] ?? 'your-email@example.com');
+define('FROM_NAME', $_ENV['FROM_NAME'] ?? 'Buy Sell Phone');
 
 // OTP configuration
-define('OTP_LENGTH', 6);
-define('OTP_EXPIRY_MINUTES', 10);
-define('MAX_OTP_ATTEMPTS', 3);
+define('OTP_LENGTH', (int)($_ENV['OTP_LENGTH'] ?? 6));
+define('OTP_EXPIRY_MINUTES', (int)($_ENV['OTP_EXPIRY_MINUTES'] ?? 10));
+define('MAX_OTP_ATTEMPTS', (int)($_ENV['MAX_OTP_ATTEMPTS'] ?? 3));
 
 // Function to check network connectivity
 function checkNetworkConnectivity() {
