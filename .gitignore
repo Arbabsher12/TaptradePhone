@@ -1,2 +1,5 @@
 /uploads/ 
 .env
+/php/brevo_config.php
+/php/google_config.php
+
